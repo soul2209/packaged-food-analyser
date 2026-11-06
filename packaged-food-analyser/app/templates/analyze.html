@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Analyse a product | FoodCheck{% endblock %}
+{% block content %}
+<div class="wrap page-head">
+  <h1>Analyse a product</h1>
+  <p class="lede">Look up a barcode, photograph the label, or paste the text. You get a score, the reasons behind it, and every additive and allergen found.</p>
+</div>
+
+<div class="wrap workbench">
+  <section class="input-panel" aria-label="Product input">
+    <div class="tabs" role="tablist">
+      <button class="tab active" role="tab" id="tab-barcode" aria-selected="true" aria-controls="form-barcode" data-tab="barcode">Barcode</button>
+      <button class="tab" role="tab" id="tab-image" aria-selected="false" aria-controls="form-image" data-tab="image">Photo</button>
+      <button class="tab" role="tab" id="tab-text" aria-selected="false" aria-controls="form-text" data-tab="text">Paste text</button>
+    </div>
+
+    <form id="form-barcode" class="panel active" data-panel="barcode" role="tabpanel" aria-labelledby="tab-barcode">
+      <label class="field" for="barcode-input">Barcode number</label>
+      <input id="barcode-input" type="text" inputmode="numeric" autocomplete="off" placeholder="2000000100005" required>
+      <button class="btn primary" type="submit">Look up product</button>
+      <label class="field" for="barcode-image">Or upload a photo of the barcode</label>
+      <input id="barcode-image" type="file" accept="image/*">
+      <div class="samples">
+        <p class="small">Or pick a product we already know</p>
+        <div class="chips" id="sample-chips"><span class="small">Loading products.</span></div>
+      </div>
+    </form>
+
+    <form id="form-image" class="panel" data-panel="image" role="tabpanel" aria-labelledby="tab-image" hidden>
+      <label class="drop" id="drop" for="image-input">
+        <input id="image-input" type="file" accept="image/*" required>
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M24 32V12M16 20l8-8 8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 34v4h28v-4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </span>
+        <span class="drop-title" id="drop-title">Drop a label photo here</span>
+        <span class="small" id="drop-sub">or click to choose one. You can also paste an image from your clipboard.</span>
+      </label>
+      <div class="preview-row" id="preview-row" hidden>
+        <img id="image-preview" alt="Selected label photo">
+        <button type="button" class="link-btn" id="image-clear">Remove photo</button>
+      </div>
+      <label class="field" for="image-barcode">Barcode number (optional)</label>
+      <input id="image-barcode" type="text" inputmode="numeric" autocomplete="off" placeholder="8901234567890">
+      <button class="btn primary" type="submit">Analyse photo</button>
+    </form>
+
+    <form id="form-text" class="panel" data-panel="text" role="tabpanel" aria-labelledby="tab-text" hidden>
+      <label class="field" for="text-input">Label text</label>
+      <textarea id="text-input" rows="10" placeholder="Ingredients: ...&#10;Nutrition Information (per 100 g)&#10;Energy 480 kcal&#10;..." required></textarea>
+      <div class="btn-row">
+        <button class="btn primary" type="submit">Analyse text</button>
+        <button class="btn" type="button" id="load-sample">Load a sample</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="result-area" id="result-area" aria-live="polite" aria-label="Result">
+    <div class="empty" id="empty">
+      <svg viewBox="0 0 120 70" aria-hidden="true"><path d="M10 62a50 50 0 0 1 100 0" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" opacity=".25"/></svg>
+      <h2>Your report shows up here</h2>
+      <p>Pick one of the known products on the left to see a full report in a few seconds.</p>
+    </div>
+    <div id="result" hidden></div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='analyze.js') }}"></script>
+{% endblock %}

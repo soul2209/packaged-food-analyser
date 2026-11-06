@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Report {{ scan_id }} | FoodCheck{% endblock %}
+{% block content %}
+<div class="wrap page-tools no-print">
+  <a class="btn" href="{{ url_for('pages.history') }}">Back to history</a>
+  <button class="btn primary" onclick="window.print()">Print or save as PDF</button>
+</div>
+<div class="wrap">
+  <section id="result" aria-live="polite"><p class="muted">Loading report.</p></section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+fetch('/api/scans/{{ scan_id }}')
+  .then(r => r.json().then(d => ({ok: r.ok, d})))
+  .then(({ok, d}) => {
+    const el = document.getElementById('result');
+    if (!ok) { el.innerHTML = '<p class="notice error">' + esc(d.error || 'That report does not exist.') + ' <a href="/history">Back to history</a></p>'; return; }
+    renderResult(d, el);
+  })
+  .catch(() => { document.getElementById('result').innerHTML = '<p class="notice error">Could not load the report. Check that the server is running and reload.</p>'; });
+</script>
+{% endblock %}

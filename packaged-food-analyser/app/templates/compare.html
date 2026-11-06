@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Compare | FoodCheck{% endblock %}
+{% block content %}
+<div class="wrap page-head">
+  <h1>Compare two products</h1>
+  <p class="lede">Pick two scans and see which one is the better choice, and where each one loses points.</p>
+</div>
+
+<div class="wrap">
+  <div class="pickers" id="pickers" hidden>
+    <label class="field-block"><span>First product</span><select id="pick-a"></select></label>
+    <label class="field-block"><span>Second product</span><select id="pick-b"></select></label>
+    <button class="btn primary" id="go">Compare</button>
+  </div>
+  <div id="compare" aria-live="polite"></div>
+  <div class="empty" id="compare-empty" hidden>
+    <h2>Nothing to compare yet</h2>
+    <p>Scan at least two products first, or load a ready-made pair to see how the comparison works.</p>
+    <div class="btn-row">
+      <button class="btn primary" id="load-pair">Compare oats with chocolate biscuits</button>
+      <a class="btn" href="{{ url_for('pages.analyze_page') }}">Analyse a product</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='compare.js') }}"></script>
+{% endblock %}

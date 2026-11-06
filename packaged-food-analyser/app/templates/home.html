@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1>Tap the ingredient. Watch the score move.</h1>
+      <p class="lede">FoodCheck reads the ingredients and nutrition table on a packet, checks them against WHO limits, and gives one score from 0 to 100 that you can compare across products.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="{{ url_for('pages.analyze_page') }}">Analyse a product</a>
+        <a class="btn" href="#score">See how it scores</a>
+      </div>
+      <p class="hero-note">Try the sample label. Every underlined ingredient costs points, and the number you see comes from the same engine that scores real products.</p>
+    </div>
+
+    <div class="stage">
+      <article class="label" id="demo" aria-label="Interactive sample label">
+        <header class="label-head">
+          <div>
+            <h2>Choco cream biscuits</h2>
+            <p class="muted">Sample label, per 100 g</p>
+          </div>
+          <div class="gauge-wrap" id="demo-gauge"></div>
+        </header>
+
+        <p class="ing" id="demo-ing">
+          <span class="ing-lead">Ingredients:</span>
+          <span class="tok" data-text="Refined wheat flour (maida) 42%">Refined wheat flour (maida) 42%</span>,
+          <button type="button" class="tok flag" data-text="Sugar" aria-pressed="false">Sugar</button>,
+          <button type="button" class="tok flag" data-text="Palm oil" aria-pressed="false">Palm oil</button>,
+          <button type="button" class="tok flag" data-text="Glucose syrup" aria-pressed="false">Glucose syrup</button>,
+          <span class="tok" data-text="Milk solids">Milk solids</span>,
+          <span class="tok" data-text="Cocoa powder">Cocoa powder</span>,
+          <button type="button" class="tok flag" data-text="Raising agents (E500, E450)" aria-pressed="false">Raising agents (E500, E450)</button>,
+          <span class="tok" data-text="Emulsifier (Soy lecithin E322)">Emulsifier (Soy lecithin E322)</span>,
+          <span class="tok" data-text="Iodised salt">Iodised salt</span>,
+          <button type="button" class="tok flag" data-text="Colour (E102)" aria-pressed="false">Colour (E102)</button>,
+          <span class="tok" data-text="Flavour">Flavour</span>.
+          <span class="ing-lead">Contains:</span> Wheat, Milk, Soy.
+        </p>
+
+        <div class="label-rule"></div>
+        <div class="mini-bars" id="demo-bars" aria-label="Nutrition against WHO daily limits"></div>
+        <p class="label-foot">The nutrition table stays as printed. Only the ingredient checks change when you leave something out.</p>
+
+        <div class="demo-say" id="demo-say" role="status" aria-live="polite">
+          <p>Tap an underlined ingredient to leave it out of the recipe and see what it cost.</p>
+        </div>
+        <button type="button" class="link-btn" id="demo-reset" hidden>Put everything back</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <h2 class="section-title">From a packet to a score in three steps</h2>
+    <ol class="flow">
+      <li>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="5" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="24" cy="24" r="7" fill="none" stroke="currentColor" stroke-width="3"/><path d="M17 10l2-4h10l2 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
+        <h3>Photograph the label</h3>
+        <p>Take a photo of the ingredients and nutrition table, type a barcode, or paste the text. Barcodes in the photo are picked up automatically.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 14h28M10 24h20M10 34h26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M36 28l4 4 6-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>We read and sort it</h3>
+        <p>Tesseract reads the text. We split the ingredient list, find E-numbers, and turn the nutrition table into values per 100 g, even when the pack prints per serving.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 34a16 16 0 0 1 32 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24 34l8-11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="34" r="3" fill="currentColor"/></svg>
+        <h3>Get a score you can act on</h3>
+        <p>The report shows the score, what lost points, which additives and allergens were found, and how it compares with any other product you have scanned.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="band tint" id="score">
+  <div class="wrap score-grid">
+    <div>
+      <h2 class="section-title">Where the score comes from</h2>
+      <p class="lede">Every product starts at 100. Points come off for what the WHO says to limit, and a few come back for fibre. Nothing is hidden: this table is read straight from the database the app scores with.</p>
+      <div class="grade-strip" role="img" aria-label="Grades: {% for g in grades %}{{ g.letter }} is {{ g.low }} to {{ g.high }}{% if not loop.last %}, {% endif %}{% endfor %}">
+        {% for g in grades %}
+        <div class="g grade-{{ g.letter|lower }}"><strong>{{ g.letter }}</strong><span>{{ g.low }} to {{ g.high }}</span></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <table class="ledger">
+      <caption class="sr">Score ledger</caption>
+      <thead><tr><th scope="col">Check</th><th scope="col">WHO daily value</th><th scope="col" class="num">Points</th></tr></thead>
+      <tbody>
+        {% for b in limits %}
+        <tr><th scope="row">{{ b.label }}</th><td>under {{ '%g'|format(b.daily_value) }} {{ b.unit }}</td><td class="num loss">up to &minus;{{ '%g'|format(b.max_penalty) }}</td></tr>
+        {% endfor %}
+        <tr><th scope="row">Additives</th><td>high risk &minus;{{ risk_penalty.high }}, moderate &minus;{{ risk_penalty.moderate }} each</td><td class="num loss">up to &minus;{{ additive_cap }}</td></tr>
+        {% for text, points in ingredient_rules %}
+        <tr><th scope="row">{{ text }}</th><td>ingredient list</td><td class="num loss">&minus;{{ points }}</td></tr>
+        {% endfor %}
+        {% for b in targets %}
+        <tr><th scope="row">{{ b.label }}</th><td>at least {{ '%g'|format(b.daily_value) }} {{ b.unit }}</td><td class="num gain">up to +{{ '%g'|format(b.max_bonus) }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="band" id="indian">
+  <div class="wrap">
+    <h2 class="section-title">Made for labels you find in an Indian kitchen</h2>
+    <p class="facts-copy">FoodCheck recognises <b>{{ stats.sugar_names }} names for sugar</b>, explains <b>{{ stats.additives }} E-numbers</b> in plain words, matches <b>{{ stats.allergen_terms }} allergen keywords</b> and can look up <b>{{ stats.products }} products</b> by barcode. Anything else can be scanned from a photo.</p>
+    <p class="facts-sub">The allergen list includes maida, atta, rava and vanaspati, which a generic checker would miss. Jaggery counts as free sugar even though it is traditional, and the colours the EU asks to carry a children's warning are marked high risk.</p>
+  </div>
+</section>
+
+<section class="band tint" id="team">
+  <div class="wrap">
+    <h2 class="section-title">Four parts, four owners</h2>
+    <ul class="team">
+      {% for member in team %}
+      <li>
+        <h3>{{ member.role }}</h3>
+        {% if member.name %}<p class="who">{{ member.name }}</p>{% endif %}
+        <p>{{ member.work }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="built">Built at {{ about.institute }} as a {{ about.course|lower }} project with {{ about.stack|join(', ') }}.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap cta-inner">
+    <h2>Try it on a packet from your kitchen.</h2>
+    <a class="btn primary on-haldi" href="{{ url_for('pages.analyze_page') }}">Analyse a product</a>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='home.js') }}"></script>
+{% endblock %}

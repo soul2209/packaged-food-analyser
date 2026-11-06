@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}History | FoodCheck{% endblock %}
+{% block content %}
+<div class="wrap page-head">
+  <h1>Scan history</h1>
+  <p class="lede" id="history-lede">Every product you analyse is saved here. Tick two to compare them side by side.</p>
+</div>
+
+<div class="wrap">
+  <div class="filters" id="filters" hidden>
+    <div class="grade-filter" role="group" aria-label="Filter by grade" id="grade-filter"></div>
+    <label class="search"><span class="sr">Search scans</span><input type="search" id="search" placeholder="Search by product" autocomplete="off"></label>
+  </div>
+  <ul class="scan-list" id="list"><li class="muted">Loading.</li></ul>
+  <div class="empty" id="history-empty" hidden>
+    <h2>No scans yet</h2>
+    <p>Analyse a product and it will be saved here.</p>
+    <a class="btn primary" href="{{ url_for('pages.analyze_page') }}">Analyse a product</a>
+  </div>
+</div>
+
+<div class="compare-bar no-print" id="compare-bar" hidden>
+  <div class="wrap compare-bar-inner">
+    <p id="compare-text"></p>
+    <button class="btn primary" id="compare-btn" disabled>Compare</button>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='history.js') }}"></script>
+{% endblock %}

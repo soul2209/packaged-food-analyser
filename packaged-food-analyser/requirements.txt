@@ -1,0 +1,5 @@
+Flask>=3.0
+pytesseract>=0.3.10
+Pillow>=10.0
+pytest>=8.0
+zxing-cpp>=2.2
